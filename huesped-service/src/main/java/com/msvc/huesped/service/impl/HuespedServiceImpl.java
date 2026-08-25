@@ -4,6 +4,8 @@ import com.msvc.huesped.entity.Calificacion;
 import com.msvc.huesped.entity.Hotel;
 import com.msvc.huesped.entity.Huesped;
 import com.msvc.huesped.exception.ResourceNotFoundException;
+import com.msvc.huesped.external.service.CalificacionService;
+import com.msvc.huesped.external.service.HotelService;
 import com.msvc.huesped.repository.HuespedRepository;
 import com.msvc.huesped.service.HuespedService;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,12 @@ public class HuespedServiceImpl implements HuespedService {
     @Autowired
     private HuespedRepository huespedRepository;
 
+    @Autowired
+    private HotelService hotelService;
+
+    @Autowired
+    private CalificacionService calificacionService;
+
     @Override
     public Huesped saveHuesped(Huesped huesped) {
         String randomHuespedId = UUID.randomUUID().toString();
@@ -43,24 +51,30 @@ public class HuespedServiceImpl implements HuespedService {
         // 1. Obtenemos el usuario
         Huesped huesped = huespedRepository.findById(huespedId)
                 .orElseThrow(() -> new ResourceNotFoundException("Huesped no encontrado con ID : " + huespedId));
+
         // 2. Obtenemos el listado de calificaciones del huesped
-        Calificacion[] calificacionesDelHuesped = restTemplate
-                // .getForObject("http://localhost:8083/calificaciones/huespedes/" + huesped.getHuespedId(), Calificacion[].class);
-                .getForObject("http://CALIFICACION-SERVICE/calificaciones/huespedes/" + huesped.getHuespedId(), Calificacion[].class);
-        // 3. Convertimos array de calificaciones a un ArrayList
-        List<Calificacion> calificaciones = Arrays.asList(calificacionesDelHuesped);
+//        Calificacion[] calificacionesDelHuesped = restTemplate
+//                // .getForObject("http://localhost:8083/calificaciones/huespedes/" + huesped.getHuespedId(), Calificacion[].class);
+//                .getForObject("http://CALIFICACION-SERVICE/calificaciones/huespedes/" + huesped.getHuespedId(), Calificacion[].class);
+//        // 3. Convertimos array de calificaciones a un ArrayList
+//        List<Calificacion> calificaciones = Arrays.asList(calificacionesDelHuesped);
+        List<Calificacion> calificaciones = calificacionService.calificacionesHuesped(huesped.getHuespedId());
+
         // 4. Mostramos el listado de calificaciones en consola
         log.info("Calificaciones del huesped: {}", calificaciones);
 
         // A la lista de calificaciones añadimos los datos de los hoteles
         List<Calificacion> listaCalificaciones = calificaciones.stream().map(calificacion -> {
             System.out.println("Hotel ID: " + calificacion.getHotelId());
+
             // Obtener datos del hotel por el ID
-            ResponseEntity<Hotel> forEntity = restTemplate
-                    // .getForEntity("http://localhost:8082/hoteles/" + calificacion.getHotelId(), Hotel.class);
-                    .getForEntity("http://HOTEL-SERVICE/hoteles/" + calificacion.getHotelId(), Hotel.class);
-            Hotel hotel = forEntity.getBody();
-            log.info("Respuesta con codigo de estado: {}", forEntity.getStatusCode());
+//            ResponseEntity<Hotel> forEntity = restTemplate
+//                    // .getForEntity("http://localhost:8082/hoteles/" + calificacion.getHotelId(), Hotel.class);
+//                    .getForEntity("http://HOTEL-SERVICE/hoteles/" + calificacion.getHotelId(), Hotel.class);
+//            Hotel hotel = forEntity.getBody();
+//            log.info("Respuesta con codigo de estado: {}", forEntity.getStatusCode());
+            Hotel hotel = hotelService.getHotel(calificacion.getHotelId());
+
             // Añadimos los datos del hotel a la calificacion
             calificacion.setHotel(hotel);
             // Retornar la calificacion para luego añadirla al List
