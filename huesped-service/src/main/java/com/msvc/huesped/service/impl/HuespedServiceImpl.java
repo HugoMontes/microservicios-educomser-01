@@ -45,7 +45,8 @@ public class HuespedServiceImpl implements HuespedService {
                 .orElseThrow(() -> new ResourceNotFoundException("Huesped no encontrado con ID : " + huespedId));
         // 2. Obtenemos el listado de calificaciones del huesped
         Calificacion[] calificacionesDelHuesped = restTemplate
-                .getForObject("http://localhost:8083/calificaciones/huespedes/" + huesped.getHuespedId(), Calificacion[].class);
+                // .getForObject("http://localhost:8083/calificaciones/huespedes/" + huesped.getHuespedId(), Calificacion[].class);
+                .getForObject("http://CALIFICACION-SERVICE/calificaciones/huespedes/" + huesped.getHuespedId(), Calificacion[].class);
         // 3. Convertimos array de calificaciones a un ArrayList
         List<Calificacion> calificaciones = Arrays.asList(calificacionesDelHuesped);
         // 4. Mostramos el listado de calificaciones en consola
@@ -56,7 +57,8 @@ public class HuespedServiceImpl implements HuespedService {
             System.out.println("Hotel ID: " + calificacion.getHotelId());
             // Obtener datos del hotel por el ID
             ResponseEntity<Hotel> forEntity = restTemplate
-                    .getForEntity("http://localhost:8082/hoteles/" + calificacion.getHotelId(), Hotel.class);
+                    // .getForEntity("http://localhost:8082/hoteles/" + calificacion.getHotelId(), Hotel.class);
+                    .getForEntity("http://HOTEL-SERVICE/hoteles/" + calificacion.getHotelId(), Hotel.class);
             Hotel hotel = forEntity.getBody();
             log.info("Respuesta con codigo de estado: {}", forEntity.getStatusCode());
             // Añadimos los datos del hotel a la calificacion
