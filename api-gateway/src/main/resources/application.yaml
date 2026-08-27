@@ -1,0 +1,42 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: huesped-service
+              uri: lb://HUESPED-SERVICE
+              predicates:
+                - Path=/huespedes/**
+
+            - id: hotel-service
+              uri: lb://HOTEL-SERVICE
+              predicates:
+                - Path=/hoteles/**,/habitaciones/**
+
+            - id: calificacion-service
+              uri: lb://CALIFICACION-SERVICE
+              predicates:
+                - Path=/calificaciones/**
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+# Opcional: Permite mostrar logs
+# NO debe usarse en produccion
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE
+    reactor.netty.http.client: DEBUG
