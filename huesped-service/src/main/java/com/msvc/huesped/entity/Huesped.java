@@ -29,4 +29,7 @@ public class Huesped {
 
     @Transient
     private List<Calificacion> calificaciones = new ArrayList<>();
+
+    @Transient
+    private String informacionAdicional;
 }

@@ -8,13 +8,13 @@ import com.msvc.huesped.external.service.CalificacionService;
 import com.msvc.huesped.external.service.HotelService;
 import com.msvc.huesped.repository.HuespedRepository;
 import com.msvc.huesped.service.HuespedService;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,8 +46,15 @@ public class HuespedServiceImpl implements HuespedService {
         return huespedRepository.findAll();
     }
 
-    @Override
+    private int cantidadReintentos = 1;
+
+    // @CircuitBreaker(name = "huespedServiceBreaker", fallbackMethod = "fallbackHuesped")
+    @Retry(name = "huespedServiceRetry", fallbackMethod = "fallbackHuesped")
     public Huesped getHuesped(String huespedId) {
+        log.info("Listar un solo huesped: HuespedServiceImpl");
+        log.info("Cantidad de intentos: {}", cantidadReintentos);
+        cantidadReintentos++;
+
         // 1. Obtenemos el usuario
         Huesped huesped = huespedRepository.findById(huespedId)
                 .orElseThrow(() -> new ResourceNotFoundException("Huesped no encontrado con ID : " + huespedId));
@@ -86,6 +93,14 @@ public class HuespedServiceImpl implements HuespedService {
         huesped.setCalificaciones(listaCalificaciones);
 
         // 6. Retornar el huesped con las calificaciones
+        return huesped;
+    }
+
+    public Huesped fallbackHuesped(String huespedId, Exception exception) {
+        Huesped huesped = huespedRepository.findById(huespedId).orElseThrow();
+        log.info("Ejecutar fallbackHuesped: {}", huesped);
+        huesped.setInformacionAdicional("Algunos servicios no estan disponibles");
+        huesped.setCalificaciones(new ArrayList<>());
         return huesped;
     }
 }
