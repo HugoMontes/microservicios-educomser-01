@@ -4,8 +4,11 @@ server:
 spring:
   application:
     name: hotel-service
-  config:
-    import: optional:configserver:http://localhost:8085
+  cloud:
+    config:
+      enabled: false
+#  config:
+#    import: optional:configserver:http://localhost:8085
 #  profiles:
 #    active: dev
   datasource:
@@ -16,6 +19,12 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka:123456@localhost:8761/eureka
+#      defaultZone: http://localhost:8761/eureka
 
 #eureka:
 #  instance:

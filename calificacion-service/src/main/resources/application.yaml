@@ -4,10 +4,19 @@ server:
 spring:
   application:
     name: calificacion-service
-  config:
-    import: optional:configserver:http://localhost:8085
+  cloud:
+    config:
+      enabled: false
+#  config:
+#    import: optional:configserver:http://localhost:8085
   mongodb:
     uri: mongodb://localhost:27017/microservicios
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka:123456@localhost:8761/eureka
+#      defaultZone: http://localhost:8761/eureka
 
 #eureka:
 #  instance:

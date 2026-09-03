@@ -6,8 +6,11 @@ server:
 spring:
   application:
     name: huesped-service
-  config:
-    import: optional:configserver:http://localhost:8085
+  cloud:
+    config:
+      enabled: false
+#  config:
+#    import: optional:configserver:http://localhost:8085
 #  profiles:
 #    active: prod
   datasource:
@@ -22,6 +25,18 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/proyecto02-microservicios-realm
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka:123456@localhost:8761/eureka
+#      defaultZone: http://localhost:8761/eureka
 
 #eureka:
 #  instance:

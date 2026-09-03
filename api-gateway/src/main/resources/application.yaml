@@ -5,6 +5,9 @@ spring:
   application:
     name: api-gateway
 
+  # ==============================================
+  # Configuracion de rutas del Gateway
+  # ==============================================
   cloud:
     gateway:
       server:
@@ -25,6 +28,19 @@ spring:
               predicates:
                 - Path=/calificaciones/**
 
+
+  # ==============================================
+  # Punto de entrada para los clientes
+  # ==============================================
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/proyecto02-microservicios-realm
+
+# ==============================================
+# Configuración de Eureka (Client)
+# ==============================================
 eureka:
   instance:
     prefer-ip-address: true
@@ -32,7 +48,8 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://eureka:123456@localhost:8761/eureka
+#      defaultZone: http://localhost:8761/eureka/
 
 # Opcional: Permite mostrar logs
 # NO debe usarse en produccion
