@@ -81,3 +81,7 @@ resilience4j:
       huespedServiceRetry: # Nombre del retry (debe coincidir con @Retry)
         max-attempts: 3    # Número máximo de intentos
         wait-duration: 5s  # Tiempo de espera entre cada reintento
+
+logging:
+  pattern:
+    level: "%5p [traceId=%X{trace_id} spanId=%X{span_id}]"
